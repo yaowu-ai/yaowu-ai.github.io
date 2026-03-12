@@ -53,7 +53,7 @@ export function LysmataFeatures({ title, features }: FeaturesProps) {
                       : 'opacity-0 scale-95'
                   }`}
                 />
-                <div className="relative rounded-2xl border border-gray-100 bg-white p-7 shadow-lg transition-all duration-300 hover:shadow-xl lg:p-8">
+                <div className="relative rounded-2xl border border-gray-100 bg-white p-7 shadow-lg transition-all duration-300 hover:shadow-xl lg:p-8 h-full w-full">
                   <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                     <Icon />
                   </div>
@@ -63,24 +63,6 @@ export function LysmataFeatures({ title, features }: FeaturesProps) {
                   <p className="text-gray-600 leading-relaxed">
                     {feature.desc}
                   </p>
-                  <div className="mt-6 pt-6 border-t border-gray-100">
-                    <div className="flex items-center text-blue-600 font-medium">
-                      <span>Learn more</span>
-                      <svg
-                        className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        />
-                      </svg>
-                    </div>
-                  </div>
                 </div>
               </div>
             )

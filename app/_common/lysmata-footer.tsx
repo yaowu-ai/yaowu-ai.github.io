@@ -23,7 +23,7 @@ export function LysmataFooter() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex flex-row gap-6">
             <a
               href="https://github.com/yaowu-ai/lysmata"
               className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
@@ -54,7 +54,7 @@ export function LysmataFooter() {
 
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
           <p>
-            © 2026 Lysmata. Built for OpenClaw. All rights reserved.
+            © 2026 <a href='https://www.jxxqtech.com/' target='_blank' rel="noopener noreferrer nofollow">YaowuTech</a>. Built for OpenClaw. All rights reserved.
           </p>
           <p className="mt-2 text-sm">
             Open source under MIT License. Made with ❤️ by the OpenClaw community.

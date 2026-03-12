@@ -40,7 +40,7 @@ export function LysmataArchitecture({ title, architecture }: ArchitectureProps) 
                   onMouseEnter={() => setActiveLayer(index)}
                 >
                   <div
-                    className={`rounded-2xl border-2 bg-white p-7 shadow-lg transition-all duration-300 lg:p-8 ${
+                    className={`rounded-2xl h-56 border-2 bg-white p-7 shadow-lg transition-all duration-300 lg:p-8 ${
                       activeLayer === index
                         ? 'border-blue-500 shadow-xl'
                         : 'border-gray-100'

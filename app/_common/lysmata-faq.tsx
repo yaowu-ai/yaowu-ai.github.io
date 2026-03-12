@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface FAQItem {
   q: string
@@ -12,8 +12,46 @@ interface FAQProps {
   faq: readonly FAQItem[]
 }
 
+// 生成FAQ项的ID（基于问题文本）
+function generateFAQId(q: string, index: number): string {
+  // 移除特殊字符，转换为小写，用连字符连接
+  return `faq-${index}-${q
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .replace(/\s+/g, '-')
+    .substring(0, 30)}`
+}
+
 export function LysmataFAQ({ title, faq }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+
+  // 处理URL锚点跳转
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      if (hash) {
+        const id = hash.substring(1) // 移除#号
+        const index = faq.findIndex((item, idx) => generateFAQId(item.q, idx) === id)
+        if (index !== -1) {
+          setOpenIndex(index)
+          // 滚动到对应元素
+          setTimeout(() => {
+            const element = document.getElementById(id)
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth' })
+            }
+          }, 100)
+        }
+      }
+    }
+
+    // 初始检查
+    handleHashChange()
+
+    // 监听hash变化
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [faq])
 
   return (
     <section className="bg-gradient-to-b from-gray-50 to-white py-20 md:py-24">
@@ -28,50 +66,112 @@ export function LysmataFAQ({ title, faq }: FAQProps) {
             </p>
           </div>
 
+          {/* FAQ 锚点导航 */}
+          <div className="mb-8 p-5 bg-gray-50 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">快速导航</h3>
+            <div className="flex flex-wrap gap-2">
+              {faq.map((item, index) => {
+                const faqId = generateFAQId(item.q, index)
+                return (
+                  <a
+                    key={index}
+                    href={`#${faqId}`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setOpenIndex(index)
+                      window.history.pushState(null, '', `#${faqId}`)
+                      const element = document.getElementById(faqId)
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors"
+                  >
+                    <span className="mr-1.5 text-gray-500">#</span>
+                    {item.q.length > 30 ? `${item.q.substring(0, 30)}...` : item.q}
+                  </a>
+                )
+              })}
+            </div>
+            <p className="mt-3 text-sm text-gray-500">
+              点击问题可直接跳转到对应位置，URL 也会更新为锚点链接，方便分享
+            </p>
+          </div>
+
           <div className="space-y-5">
-            {faq.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all hover:shadow-md"
-              >
-                <button
-                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="flex w-full items-center justify-between px-7 py-6 text-left focus:outline-none"
-                >
-                  <h3 className="text-lg font-semibold text-gray-900 pr-4">
-                    {item.q}
-                  </h3>
-                  <div className="flex-shrink-0">
-                    <svg
-                      className={`w-5 h-5 text-gray-500 transition-transform ${
-                        openIndex === index ? 'transform rotate-180' : ''
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </button>
+            {faq.map((item, index) => {
+              const faqId = generateFAQId(item.q, index)
+              return (
                 <div
-                  className={`px-6 overflow-hidden transition-all duration-300 ${
-                    openIndex === index
-                      ? 'pb-5 opacity-100'
-                      : 'max-h-0 opacity-0'
-                  }`}
+                  key={index}
+                  id={faqId}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all hover:shadow-md scroll-mt-20"
                 >
-                  <div className="pt-2 border-t border-gray-100">
-                    <p className="text-gray-600 leading-relaxed">{item.a}</p>
+                  <button
+                    onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                    className="flex w-full items-center justify-between px-7 py-6 text-left focus:outline-none"
+                  >
+                    <div className="flex items-start">
+                      <span className="inline-flex items-center justify-center w-6 h-6 mr-3 mt-0.5 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">
+                        {index + 1}
+                      </span>
+                      <h3 className="text-lg font-semibold text-gray-900 pr-4">
+                        {item.q}
+                      </h3>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <svg
+                        className={`w-5 h-5 text-gray-500 transition-transform ${
+                          openIndex === index ? 'transform rotate-180' : ''
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+                  <div
+                    className={`px-6 overflow-hidden transition-all duration-300 ${
+                      openIndex === index
+                        ? 'pb-5 opacity-100'
+                        : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="pt-2 border-t border-gray-100">
+                      <p className="text-gray-600 leading-relaxed">{item.a}</p>
+                      <div className="mt-4 pt-3 border-t border-gray-100">
+                        <a
+                          href={`#${faqId}`}
+                          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#${faqId}`)
+                            const target = e.target as HTMLElement
+                            const originalText = target.textContent
+                            target.textContent = '链接已复制!'
+                            setTimeout(() => {
+                              target.textContent = originalText
+                            }, 2000)
+                          }}
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                          复制此问题链接
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Additional Help */}
